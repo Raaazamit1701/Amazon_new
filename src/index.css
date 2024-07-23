@@ -1,63 +1,49 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Roboto:wght@300;400;500;700;900&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer components {
   .headerHover {
-    @apply px-2 h-[80%] flex items-center border border-transparent hover:border-white cursor-pointer duration-100;
+    @apply flex  h-full py-2 px-2 items-center rounded-sm border border-transparent hover:border-white cursor-pointer duration-100;
   }
-  .footerLink{
-    @apply text-sm font-titlefont tracking-wide hover:text-gray-100 cursor-pointer
-    hover:underline duration-150
+
+  .sideBarItems {
+    @apply text-sm leading-4 font-medium flex items-center justify-between  pt-3 pr-5 pb-3 pl-9 text-lightGray hover:bg-[#eee] hover:text-black cursor-pointer;
   }
-  .productLi{
-    @apply text-gray-600 hover:text-black text-sm font-medium border-b-[1px]
-    border-b-gray-400 hover:border-b-gray-700 flex items-center justify-end gap-2
-    hover:cursor-pointer duration-300 w-full
+  .footerLink {
+    @apply text-sm font-normal tracking-wide hover:text-gray-100 cursor-pointer hover:underline duration-150;
+  }
+  .footerItemHover {
+    @apply flex gap-1 items-center justify-center border border-gray-500
+           hover:border-amazon_yellow cursor-pointer duration-200 px-2 py-1;
+  }
+  .inputBox {
+    @apply w-full border border-zinc-400 rounded px-2 py-1 text-sm
+            outline-none focus-within:border-[#e77600] focus-within:shadow-amazonInput duration-100
+            placeholder:text-[13px] shadow-inputBoxShadow font-normal;
+  }
+  .amazonButton {
+    @apply w-full border border-[#fcd200] bg-amazon_button hover:bg-amazon_button_hover rounded-lg py-[6px]
+           text-[13px] font-medium focus:border-[#008296]  duration-150 focus:shadow-activeAmazonButtonShadow 
+           shadow-amazonButtonShadow;
+  }
+  .defaultLink {
+    @apply text-blue-600  hover:text-orange-700 hover:underline cursor-pointer;
+  }
+  .errorSign {
+    @apply text-base font-bold italic text-error;
+  }
+  .cartButtonLinks {
+    @apply text-link text-xs font-normal tracking-wide cursor-pointer hover:underline duration-150 border-lightText;
+  }
+  .navigateButtonLinks {
+    @apply text-link text-xs font-normal tracking-wide cursor-pointer hover:underline duration-150 border-lightText hover:text-orange-600 outline-none;
+  }
+  .selectItem {
+    @apply font-normal bg-selectBackground  shadow-itemSelect border-selectBorder py-1 px-2 border rounded-lg hover:bg-hoverItemSelect outline-none text-slate-800 cursor-pointer;
+  }
+  .disabledAmazonButton {
+    @apply bg-[#fffae0] border border-[#ffed94] text-[#6f7373] hover:bg-[#fffae0];
   }
 }
-
-
-
-
-/* Add this CSS to your styles file */
-/* Add this CSS to your styles file */
-/* Add this CSS to your styles file */
-.banner-container {
-  width: 100%;
-  overflow: hidden;
-}
-
-.banner-image-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-}
-
-.banner-image {
-  width: 100%;
-  height: 400px; /* Set a uniform height */
-  object-fit: cover; /* Ensures the image covers the area without distortion */
-}
-
-.products-container {
-  margin-top: 20px; /* Adds space between banner and products */
-}
-
-.productLi {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.productLi:hover {
-  background-color: #f0f0f0;
-}
-
-
-

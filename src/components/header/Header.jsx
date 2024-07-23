@@ -1,140 +1,233 @@
+import { logo } from "../../assets/images";
+import { ArrowDropDownOutlined } from "@mui/icons-material";
 
+import SearchBar from "./SearchBar";
+import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
+import { useState } from "react";
+import { productCategories } from "../../constants/productCategories";
+import HeaderBottom from "./HeaderBottom";
+import useClickOutside from "../custom-hooks/useClickOutside";
+import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
+import DeliveryAddress from "./DeliveryAddress";
+import SideBar from "./SideBar";
+import MenuIcon from "@mui/icons-material/Menu";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 
+import { NavLink } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 
-
-import React, { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { logo } from '../../assets/index';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import ArrowDropDownOutlinedIcon from '@mui/icons-material/ArrowDropDownOutlined';
-import SearchIcon from '@mui/icons-material/Search';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import { allItems } from '../../constants';
-import HeaderBottom from './HeaderBottom';
-import LogoutIcon from '@mui/icons-material/Logout';
-import { getAuth, signOut } from "firebase/auth";
-import { userSignOut } from '../../redux/amazonSlice';
-import { setSearchQuery, setSelectedCategory } from '../../redux/amazonSlice';
+import LogoutIcon from "@mui/icons-material/Logout";
 
 const Header = () => {
-  const auth = getAuth();
+  const userDetails = useSelector((state) => state.signinDetails.userDetails);
+
+  const [selectedCategory, setSelectedCategory] = useState("All");
+
   const dispatch = useDispatch();
-  const [showAll, setShowAll] = useState(false);
-  const searchQuery = useSelector((state) => state.amazon.searchQuery);
-  const selectedCategory = useSelector((state) => state.amazon.selectedCategory);
-  const products = useSelector((state) => state.amazon.products);
-  const userInfo = useSelector((state) => state.amazon.userInfo);
-  const ref = useRef();
 
-  useEffect(() => {
-    document.body.addEventListener("click", (e) => {
-      if (e.target.contains(ref.current)) {
-        showAll && setShowAll(false);
-      }
-    })
-  }, [ref, showAll]);
+  const cartProductCount = useSelector(
+    (state) => state.cartDetails.productsCount
+  );
 
-  const handleLogout = () => {
-    signOut(auth)
-      .then(() => {
-        console.log("Sign out successfully");
-        dispatch(userSignOut());
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }
+  //custom hook for maintain open-close component feature
+  const [sideBar, setSideBar, sideBarRef] = useClickOutside(false);
 
-  const handleSearch = (e) => {
-    dispatch(setSearchQuery(e.target.value));
+  const openSideBar = (e) => {
+    e.stopPropagation();
+    setSideBar(true);
   };
 
-  const handleCategorySelect = (category) => {
-    dispatch(setSelectedCategory(category));
-    setShowAll(false);
+  const closeSideBar = () => {
+    setSideBar(false);
   };
-  
+  //custom hook for manage the visibility of the product categories
+  const [isCategoryVisible, setCategoryVisible, categoryRef] =
+    useClickOutside(false);
+
+  const openCategory = (e) => {
+    e.stopPropagation();
+    setCategoryVisible(!isCategoryVisible);
+  };
 
   return (
-    <div className='w-full sticky top-0 z-50'>
-      <div className='w-full bg-amazon_blue text-white mx-auto px-4 py-2 flex items-center gap-4'>
-        <Link to="/">
-          <div className='headerHover'>
-            <img className='w-24 mt-2' src={logo} alt="" />
-          </div>
-        </Link>
-        <div className='headerHover hidden mdl:inline-flex'>
-          <LocationOnIcon />
-          <p className='text-sm text-lightText font-light flex flex-col'>
-            Deliver to
-            <span className='text-sm font-semibold text-whiteText'>Home</span>
-          </p>
-        </div>
-        <div className='h-10 rounded-md hidden lgl:flex flex-grow relative'>
-          <span onClick={() => setShowAll(!showAll)} className='w-14 h-full bg-gray-200 hover:bg-gray-300 border-2 cursor-pointer duration-300 text-sm text-amazon_blue font-titlefont flex items-center justify-center rounded-tl-md rounded-bl-md'>
-            All <ArrowDropDownOutlinedIcon />
-          </span>
-          {showAll && (
-            <div>
-              <ul className='absolute w-56 h-80 top-10 left-0 overflow-y-scroll overflow-x-hidden bg-white border-[1px] border-amazon_blue text-black p-2 flex-col gap-1 z-50'>
-                {allItems.map((item) => (
-                  <li key={item._id} className='text-sm tracking-wide font-titlefont border-b-[1px] border-b-transparent hover:border-b-amazon_blue cursor-pointer duration-200' onClick={() => handleCategorySelect(item.title)}>
-                    {item.title}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-          <input
-            className='h-full text-base text-amazon_blue flex-grow outline-none border-none px-2'
-            type="text"
-            value={searchQuery}
-            onChange={handleSearch}
-            placeholder={selectedCategory || 'Search'}
-          />
-          <span className='w-12 h-full flex items-center justify-center bg-amazon_yellow hover:bg-[#f3a847] duration-300 text-amazon_blue cursor-pointer rounded-tr-md rounded-br-md'>
-            <SearchIcon />
-          </span>
-        </div>
-        <Link to="/signin">
-          <div className='flex flex-col items-start justify-center headerHover'>
-            {userInfo ? (
-              <p className='text-sm mdl:text-xs text-gray-100 mdl:text-lightText font-medium'>Hello, {userInfo.userName}</p>
-            ) : (
-              <p className='text-sm mdl:text-xs text-white mdl:text-lightText font-light'>Hello, sign in</p>
-            )}
-            <p className='text-sm font-semibold -mt-1 text-whiteText hidden mdl:inline-flex'>
-              Account & Lists <ArrowDropDownOutlinedIcon />
-            </p>
-          </div>
-        </Link>
-        <div className='hidden lgl:flex flex-col items-start justify-center headerHover'>
-          <p className='text-xs text-lightText font-light'>Returns</p>
-          <p className='text-sm font-semibold -mt-1 text-whiteText'>& Orders</p>
-        </div>
-        <Link to="/cart">
-          <div className='relative flex flex-col items-start justify-center headerHover'>
-            <ShoppingCartIcon />
-            <p className='text-xs font-semibold mt-1 text-whiteText'>
-              Cart
-              <span className='absolute text-xs top-0 left-6 font font-semibold p-1 h-4 bg-[#f3a847] text-amazon_blue rounded-full flex justify-center items-center'>
-                {products.length > 0 ? products.length : 0}
+    <>
+      <section
+        name="header-top"
+        className="sticky top-0 left-0 right-0  z-[199]"
+      >
+        <div
+          name="header-top"
+          className="flex items-center justify-between h-[60px] gap-0 lgl:gap-2 bg-amazon_blue text-white px-3 py-[5px] "
+        >
+          {/* ======================= Left Section ======================= */}
+          <section
+            name="header-left"
+            className="flex items-center gap-0 lgl:gap-2"
+          >
+            {/* ======================= SideBar Section ======================= */}
+            <section
+              name="sidebar"
+              className="headerHover p-0 mdl:hidden"
+              onClick={openSideBar}
+            >
+              <MenuIcon style={{ lineHeight: "12px" }} />
+            </section>
+
+            {/* ======================= Logo Section ======================= */}
+            <section name="logo" className="headerHover">
+              <NavLink to="/">
+                <div>
+                  <img
+                    className="w-16 mt-2 mdl:w-24"
+                    src={logo}
+                    alt="amazon-logo"
+                  />
+                </div>
+              </NavLink>
+            </section>
+
+            {/* ======================= Delivery Address ======================= */}
+            <section name="delivery-address" className="hidden mdl:block">
+              <DeliveryAddress />
+            </section>
+          </section>
+
+          {/* ======================= Search Bar ======================= */}
+          <section
+            name="searchbar"
+            className="h-10 rounded-md hidden flex-grow relative items-center mdl:flex"
+          >
+            <div
+              name="product-category"
+              onClick={openCategory}
+              className="flex h-full min-w-fit px-3 items-center justify-center bg-gray-100 hover:bg-gray-300 
+                    cursor-pointer text-lightGray rounded rounded-e-none  border-r  border-lightText"
+            >
+              <span className="text-xs">{selectedCategory}</span>
+              <span>
+                <ArrowDropDownOutlined
+                  style={{ fontSize: "20px", marginBottom: "4px" }}
+                />
               </span>
-            </p>
+
+              {isCategoryVisible && (
+                <div ref={categoryRef}>
+                  <ul
+                    className=" absolute w-56 h-80 top-10 left-0 overflow-y-scroll overflow-x-hidden 
+                bg-white border-[1px] border-amazon_blue text-black flex-col gap-1 z-[99]"
+                  >
+                    {productCategories.map((category, index) => (
+                      <li
+                        key={index}
+                        onClick={() => setSelectedCategory(category)}
+                        className=" hover:bg-hover_blue hover:text-white font-medium  text-sm"
+                      >
+                        <p className="px-2">{category}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+            <SearchBar />
+          </section>
+
+          {/* ======================= Account & Login ======================= */}
+          <section
+            name="header-right"
+            className="flex items-center gap-0 lgl:gap-2"
+          >
+            <section name="account">
+              <NavLink to="/youraccount">
+                <div className="hidden headerHover lg:flex">
+                  <div>
+                    <p className=" text-xs leading-3">
+                      Hello, {userDetails?.name?.split(" ")[0] || "Sign in"}
+                    </p>
+                    <p className=" text-sm font-bold">Account & Lists</p>
+                  </div>
+
+                  <div className="leading-3">
+                    <ArrowDropDownOutlined
+                      style={{ fontSize: "18px", marginTop: "14px" }}
+                    />
+                  </div>
+                </div>
+                <div className="headerHover lg:hidden">
+                  <p className=" text-xs leading-3">
+                    {userDetails?.name?.split(" ")[0] || "Sign in"}
+                  </p>
+                  <NavigateNextIcon
+                    viewBox="0 0 20 20"
+                    style={{
+                      fontSize: "14px",
+                    }}
+                  />
+
+                  <PersonOutlineIcon style={{ fontSize: "32px" }} />
+                </div>
+              </NavLink>
+            </section>
+
+            {/* ======================= Orders ======================= */}
+
+            <section
+              name="orders"
+              className="headerHover hidden lg:inline-block"
+            >
+              <NavLink to="/youraccount/orders">
+                <div>
+                  <p className=" text-xs leading-3">Returns</p>
+                  <p className=" text-sm font-bold">& Orders</p>
+                </div>
+              </NavLink>
+            </section>
+
+            {/* ======================= Cart ======================= */}
+            <section name="cart">
+              <NavLink to="/cart">
+                <div className=" flex items-center justify-center relative headerHover">
+                  <span>
+                    <ShoppingCartOutlinedIcon
+                      style={{ fontSize: "1.625rem" }}
+                    />
+                  </span>
+                  <p className="text-xs font-medium mt-3">Cart</p>
+                  <span
+                    className="absolute flex text-[11px] font-medium align-center justify-center top-2 left-6 w-4 h-4 
+                          bg-[#f3a847] rounded-full"
+                  >
+                    {cartProductCount}
+                  </span>
+                </div>
+              </NavLink>
+            </section>
+
+            {/* ======================= Sign Out ======================= */}
+            {userDetails?.name && (
+              <section
+                name="sign-out"
+                className="headerHover"
+                onClick={() => dispatch({ type: "reset_store" })}
+              >
+                <LogoutIcon style={{ fontSize: "28px" }} />
+              </section>
+            )}
+          </section>
+        </div>
+
+        <div className="bg-amazon_blue px-4 pb-2  mdl:hidden">
+          <div className="rounded-lg overflow-hidden">
+            <SearchBar />
           </div>
-        </Link>
-        {userInfo && (
-          <div onClick={handleLogout} className='flex flex-col justify-center items-center headerHover relative'>
-            <LogoutIcon />
-            <p className='hidden mdl:inline-flex text-xs font-semibold text-whiteText'>
-              Logout
-            </p>
-          </div>
-        )}
-      </div>
-      <HeaderBottom />
-    </div>
+        </div>
+      </section>
+
+      <HeaderBottom openSideBar={openSideBar} />
+      {sideBar && (
+        <SideBar setSideBarVisible={{ sideBar, closeSideBar, sideBarRef }} />
+      )}
+    </>
   );
 };
 
